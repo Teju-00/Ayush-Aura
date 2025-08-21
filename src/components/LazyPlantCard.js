@@ -1,0 +1,142 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import { motion } from 'framer-motion';
+import OptimizedImage from './OptimizedImage';
+
+const PlantCard = styled(motion.div)`
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
+  opacity: ${props => props.$isVisible ? 1 : 0};
+  transform: ${props => props.$isVisible ? 'translateY(0)' : 'translateY(20px)'};
+  transition: opacity 0.5s ease, transform 0.5s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(39, 174, 96, 0.15);
+    border-color: #e8f5e8;
+  }
+
+  @media (max-width: 768px) {
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+`;
+
+const PlantInfo = styled.div`
+  padding: 1.5rem;
+  background: #fafbfc;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
+const PlantName = styled.h3`
+  margin: 0 0 0.5rem;
+  color: #2c3e50;
+  font-size: 1.1rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+    line-height: 1.3;
+  }
+`;
+
+const PlantDescription = styled.p`
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+  line-height: 1.4;
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 0.8rem;
+  }
+`;
+
+const ViewButton = styled(Link)`
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #27ae60;
+  color: white;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  border: 1px solid #27ae60;
+  
+  &:hover {
+    background: #219a52;
+    border-color: #219a52;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
+    text-align: center;
+    display: block;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+const LazyPlantCard = ({ plant, index }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const cardRef = useRef(null);
+
+  useEffect(() => {
+    const currentRef = cardRef.current;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
+    );
+
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, []);
+
+  return (
+    <PlantCard
+      ref={cardRef}
+      $isVisible={isVisible}
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.3, delay: index * 0.1 }}
+    >
+      <OptimizedImage
+        src={plant.image}
+        alt={plant.name}
+        height="200px"
+        borderRadius="1rem 1rem 0 0"
+      />
+      <PlantInfo>
+        <PlantName>{plant.name}</PlantName>
+        <PlantDescription>{plant.description}</PlantDescription>
+        <ViewButton to={`/plant/${plant.id}`}>View Details</ViewButton>
+      </PlantInfo>
+    </PlantCard>
+  );
+};
+
+export default LazyPlantCard; 
