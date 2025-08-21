@@ -58,6 +58,19 @@ const Subtitle = styled.p`
   }
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+`;
+
 const CTAButton = styled(Link)`
   display: inline-block;
   padding: 1rem 2rem;
@@ -75,6 +88,45 @@ const CTAButton = styled(Link)`
     padding: 0.8rem 1.5rem;
     font-size: 0.9rem;
   }
+`;
+
+const InstallAppButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+    background: linear-gradient(135deg, #27ae60, #219a52);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+`;
+
+const InstallIcon = styled.span`
+  font-size: 1.2rem;
+`;
+
+const InstallText = styled.span`
+  font-weight: 600;
 `;
 
 const FeaturedSection = styled.section`
@@ -171,6 +223,16 @@ function Home() {
     }
   ];
 
+  const handleInstallClick = () => {
+    // Trigger the PWA install prompt
+    if (window.deferredPrompt) {
+      window.deferredPrompt.prompt();
+    } else {
+      // Fallback: show instructions
+      alert('To install this app:\n\nAndroid: Tap menu → "Add to Home Screen"\niPhone: Tap Share → "Add to Home Screen"\nDesktop: Look for install prompt in address bar');
+    }
+  };
+
   return (
     <HomeContainer>
       <HeroSection>
@@ -179,7 +241,13 @@ function Home() {
           Explore our comprehensive collection of 100 medicinal plants, each with detailed 3D models
           and traditional healing properties.
         </Subtitle>
-        <CTAButton to="/plants">Explore Plants</CTAButton>
+        <ButtonGroup>
+          <CTAButton to="/plants">Explore Plants</CTAButton>
+          <InstallAppButton onClick={handleInstallClick}>
+            <InstallIcon>📱</InstallIcon>
+            <InstallText>Install App</InstallText>
+          </InstallAppButton>
+        </ButtonGroup>
       </HeroSection>
 
       <FeaturedSection>
