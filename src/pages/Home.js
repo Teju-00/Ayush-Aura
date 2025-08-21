@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -202,6 +202,33 @@ const PlantDescription = styled.p`
 `;
 
 function Home() {
+  const [canInstall, setCanInstall] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+  useEffect(() => {
+    // Listen for the beforeinstallprompt event
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setCanInstall(true);
+    };
+
+    // Check if already installed
+    const checkIfInstalled = () => {
+      if (window.matchMedia('(display-mode: standalone)').matches || 
+          window.navigator.standalone === true) {
+        setCanInstall(false);
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    checkIfInstalled();
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
   const featuredPlants = [
     {
       id: 1,
@@ -223,10 +250,23 @@ function Home() {
     }
   ];
 
-  const handleInstallClick = () => {
-    // Trigger the PWA install prompt
-    if (window.deferredPrompt) {
-      window.deferredPrompt.prompt();
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      // Show the install prompt
+      deferredPrompt.prompt();
+      
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        setCanInstall(false);
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      
+      // Clear the deferredPrompt
+      setDeferredPrompt(null);
     } else {
       // Fallback: show instructions
       alert('To install this app:\n\nAndroid: Tap menu → "Add to Home Screen"\niPhone: Tap Share → "Add to Home Screen"\nDesktop: Look for install prompt in address bar');
