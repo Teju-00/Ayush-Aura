@@ -125,6 +125,18 @@ const DownloadText = styled.span`
   font-weight: 600;
 `;
 
+const MobileNotice = styled.p`
+  text-align: center;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin-top: 2rem;
+  padding: 0 1rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
+`;
+
 const FeaturedSection = styled.section`
   margin-top: 4rem;
 
@@ -220,18 +232,16 @@ function Home() {
   ];
 
   const handleDownloadClick = () => {
-    // Detect platform and redirect to appropriate app store
+    // Since the mobile app hasn't been created yet, show helpful information
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     
     if (/android/i.test(userAgent)) {
-      // Redirect to Google Play Store (replace with actual app link)
-      window.open('https://play.google.com/store/apps/details?id=com.ayush.herbalplants', '_blank');
+      alert('📱 Mobile App Coming Soon!\n\nWe\'re currently developing the AYUSH Herbal Plants mobile app.\n\nFor now, you can:\n• Use this website (works great on mobile!)\n• Add to home screen for app-like experience\n• Get notified when the app launches\n\nExpected launch: Coming Soon!');
     } else if (/iPad|iPhone|iPod/.test(userAgent)) {
-      // Redirect to Apple App Store (replace with actual app link)
-      window.open('https://apps.apple.com/app/ayush-herbal-plants/id123456789', '_blank');
+      alert('📱 Mobile App Coming Soon!\n\nWe\'re currently developing the AYUSH Herbal Plants mobile app.\n\nFor now, you can:\n• Use this website (works great on mobile!)\n• Add to home screen for app-like experience\n• Get notified when the app launches\n\nExpected launch: Coming Soon!');
     } else {
       // Desktop - show both options
-      alert('Download AYUSH Herbal Plants App:\n\nAndroid: Google Play Store\niOS: Apple App Store');
+      alert('📱 Mobile App Coming Soon!\n\nWe\'re currently developing the AYUSH Herbal Plants mobile app.\n\nFor now, you can:\n• Use this website (works great on mobile!)\n• Add to home screen for app-like experience\n• Get notified when the app launches\n\nExpected launch: Coming Soon!');
     }
   };
 
@@ -246,9 +256,13 @@ function Home() {
         <ButtonGroup>
           <CTAButton to="/plants">Explore Plants</CTAButton>
           <DownloadAppButton onClick={handleDownloadClick}>
-            <DownloadText>Download Mobile App</DownloadText>
+            <DownloadText>Mobile App Coming Soon</DownloadText>
           </DownloadAppButton>
         </ButtonGroup>
+        
+        <MobileNotice>
+          📱 <strong>Mobile Tip:</strong> This website works great on mobile! You can add it to your home screen for an app-like experience.
+        </MobileNotice>
       </HeroSection>
 
       <FeaturedSection>

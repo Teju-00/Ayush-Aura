@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import OptimizedImage from './OptimizedImage';
@@ -22,6 +22,7 @@ const PlantCard = styled(motion.div)`
   @media (max-width: 768px) {
     border-radius: 0.5rem;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
   }
 `;
 
@@ -88,7 +89,9 @@ const MobileHidden = styled.div`
 
 const LazyPlantCard = ({ plant, index }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const cardRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const currentRef = cardRef.current;
@@ -116,12 +119,39 @@ const LazyPlantCard = ({ plant, index }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const setFlag = () => setIsMobile(mq.matches);
+    setFlag();
+    mq.addEventListener ? mq.addEventListener('change', setFlag) : mq.addListener(setFlag);
+    return () => {
+      mq.removeEventListener ? mq.removeEventListener('change', setFlag) : mq.removeListener(setFlag);
+    };
+  }, []);
+
+  const handleCardClick = () => {
+    if (isMobile) navigate(`/plant/${plant.id}`);
+  };
+
+  const handleKeyDown = (e) => {
+    if (!isMobile) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      navigate(`/plant/${plant.id}`);
+    }
+  };
+
   return (
     <PlantCard
       ref={cardRef}
       $isVisible={isVisible}
       whileHover={{ y: -3 }}
       transition={{ duration: 0.3, delay: index * 0.1 }}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={isMobile ? 0 : -1}
+      role={isMobile ? 'button' : undefined}
+      aria-label={isMobile ? `View details for ${plant.name}` : undefined}
     >
       <OptimizedImage
         src={plant.image}
