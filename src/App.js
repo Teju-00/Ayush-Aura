@@ -2,14 +2,16 @@ import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import PerformanceMonitor from './components/PerformanceMonitor';
+import PWAInstall from './components/PWAInstall';
+import { preloadModels } from './utils/modelPreloader';
+import plants from './data/plants';
+
+// Lazy load pages for code splitting
 const Home = lazy(() => import('./pages/Home'));
 const PlantList = lazy(() => import('./pages/PlantList'));
 const PlantDetail = lazy(() => import('./pages/PlantDetail'));
 const About = lazy(() => import('./pages/About'));
 const MobileTest = lazy(() => import('./pages/MobileTest'));
-import PWAInstall from './components/PWAInstall';
-import { preloadModels } from './utils/modelPreloader';
-import plants from './data/plants';
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
