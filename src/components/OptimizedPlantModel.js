@@ -44,6 +44,18 @@ const LoadingContainer = styled.div`
   height: 100%;
 `;
 
+const MobileOptimizationNotice = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(39, 174, 96, 0.9);
+  color: white;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  z-index: 10;
+`;
+
 // Model cache to prevent re-loading the same models
 const modelCache = new Map();
 
@@ -73,6 +85,7 @@ function ModelPreloader({ modelPath }) {
 function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0] }) {
   const [hasError, setHasError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Preload the model
@@ -81,7 +94,7 @@ function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0] }) {
     }
   }, [modelPath]);
 
-  // Detect mobile devices to avoid heavy 3D rendering on low-end devices
+  // Detect mobile devices for optimization
   useEffect(() => {
     const checkMobile = () => {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -94,20 +107,23 @@ function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0] }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Preflight check to fail fast if the GLB URL is not reachable (avoids infinite loading)
+  // Preflight check to fail fast if the GLB URL is not reachable
   useEffect(() => {
     let aborted = false;
     if (!modelPath) return;
 
+    setIsLoading(true);
     fetch(modelPath, { method: 'HEAD' })
       .then((response) => {
         if (aborted) return;
         if (!response.ok) {
           setHasError(true);
         }
+        setIsLoading(false);
       })
       .catch(() => {
         if (!aborted) setHasError(true);
+        setIsLoading(false);
       });
 
     return () => {
@@ -119,12 +135,12 @@ function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0] }) {
     setHasError(true);
   };
 
-  // Fallback for mobile devices or if model errors out
-  if (hasError || isMobile) {
+  // Only show error if model actually failed to load
+  if (hasError) {
     return (
       <ModelContainer>
         <LoadingContainer>
-          <LoadingText>{isMobile ? '3D model view is optimized for desktop devices' : 'Failed to load 3D model'}</LoadingText>
+          <LoadingText>Failed to load 3D model</LoadingText>
         </LoadingContainer>
       </ModelContainer>
     );
@@ -132,37 +148,57 @@ function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0] }) {
 
   return (
     <ModelContainer>
+      {isMobile && (
+        <MobileOptimizationNotice>
+          📱 Mobile Optimized
+        </MobileOptimizationNotice>
+      )}
+      
       <Canvas 
-        camera={{ position: [0, 0, 5], fov: 45, near: 0.1, far: 1000 }} 
-        shadows
+        camera={{ 
+          position: [0, 0, 5], 
+          fov: isMobile ? 50 : 45, // Slightly wider FOV for mobile
+          near: 0.1, 
+          far: 1000 
+        }} 
+        shadows={!isMobile} // Disable shadows on mobile for better performance
         gl={{ 
-          antialias: true, 
+          antialias: !isMobile, // Disable antialiasing on mobile
           alpha: true,
-          powerPreference: "high-performance"
+          powerPreference: isMobile ? "default" : "high-performance",
+          stencil: false, // Disable stencil buffer on mobile
+          depth: true
         }}
-        dpr={[1, Math.min((window.devicePixelRatio || 1), 2)]}
+        dpr={isMobile ? 1 : [1, Math.min((window.devicePixelRatio || 1), 2)]} // Lower DPR on mobile
         onCreated={({ gl }) => {
           gl.setClearColor(0xf8f9fa, 1);
-          gl.shadowMap.enabled = true;
-          gl.shadowMap.type = 2; // PCFSoftShadowMap
+          if (!isMobile) {
+            gl.shadowMap.enabled = true;
+            gl.shadowMap.type = 2; // PCFSoftShadowMap
+          }
+          // Optimize for mobile
+          if (isMobile) {
+            gl.setPixelRatio(1);
+            gl.powerPreference = "default";
+          }
         }}
       >
-        <ambientLight intensity={1.2} />
+        <ambientLight intensity={isMobile ? 1.5 : 1.2} />
         <directionalLight
           position={[5, 10, 7.5]}
-          intensity={2.5}
-          castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
-          shadow-camera-far={50}
-          shadow-camera-left={-10}
-          shadow-camera-right={10}
-          shadow-camera-top={10}
-          shadow-camera-bottom={-10}
+          intensity={isMobile ? 2.0 : 2.5}
+          castShadow={!isMobile}
+          shadow-mapSize-width={isMobile ? 512 : 1024}
+          shadow-mapSize-height={isMobile ? 512 : 1024}
+          shadow-camera-far={isMobile ? 25 : 50}
+          shadow-camera-left={isMobile ? -5 : -10}
+          shadow-camera-right={isMobile ? 5 : 10}
+          shadow-camera-top={isMobile ? 5 : 10}
+          shadow-camera-bottom={isMobile ? -5 : -10}
         />
         <directionalLight
           position={[-5, -2, -7.5]}
-          intensity={0.7}
+          intensity={isMobile ? 0.5 : 0.7}
           color="#b0c4de"
         />
         
@@ -183,12 +219,14 @@ function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0] }) {
             />
           </Center>
           <OrbitControls 
-            enablePan 
+            enablePan={!isMobile} // Disable pan on mobile for better touch experience
             enableZoom 
             enableRotate 
-            maxDistance={10}
-            minDistance={2}
-            dampingFactor={0.05}
+            maxDistance={isMobile ? 8 : 10}
+            minDistance={isMobile ? 1.5 : 2}
+            dampingFactor={isMobile ? 0.1 : 0.05}
+            rotateSpeed={isMobile ? 0.5 : 1} // Slower rotation on mobile
+            zoomSpeed={isMobile ? 0.8 : 1} // Slower zoom on mobile
           />
           <Environment preset="apartment" background={false} />
           <Preload all />

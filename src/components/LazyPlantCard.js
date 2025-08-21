@@ -30,7 +30,7 @@ const PlantInfo = styled.div`
   background: #fafbfc;
 
   @media (max-width: 768px) {
-    padding: 1rem;
+    padding: 0.8rem;
   }
 `;
 
@@ -40,8 +40,10 @@ const PlantName = styled.h3`
   font-size: 1.1rem;
 
   @media (max-width: 768px) {
-    font-size: 1.1rem;
-    line-height: 1.3;
+    font-size: 1rem;
+    line-height: 1.2;
+    margin: 0;
+    text-align: center;
   }
 `;
 
@@ -52,9 +54,7 @@ const PlantDescription = styled.p`
   line-height: 1.4;
 
   @media (max-width: 768px) {
-    font-size: 0.85rem;
-    line-height: 1.4;
-    margin-bottom: 0.8rem;
+    display: none;
   }
 `;
 
@@ -76,14 +76,13 @@ const ViewButton = styled(Link)`
   }
 
   @media (max-width: 768px) {
-    padding: 0.8rem 1.2rem;
-    font-size: 0.9rem;
-    text-align: center;
-    display: block;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none;
+  }
+`;
+
+const MobileHidden = styled.div`
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -132,8 +131,10 @@ const LazyPlantCard = ({ plant, index }) => {
       />
       <PlantInfo>
         <PlantName>{plant.name}</PlantName>
-        <PlantDescription>{plant.description}</PlantDescription>
-        <ViewButton to={`/plant/${plant.id}`}>View Details</ViewButton>
+        <MobileHidden>
+          <PlantDescription>{plant.description}</PlantDescription>
+          <ViewButton to={`/plant/${plant.id}`}>View Details</ViewButton>
+        </MobileHidden>
       </PlantInfo>
     </PlantCard>
   );

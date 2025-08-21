@@ -72,8 +72,8 @@ const PlantGrid = styled.div`
   gap: 2rem;
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
   }
 `;
 
@@ -168,6 +168,12 @@ const PageInfo = styled.span`
   }
 `;
 
+const MobileHidden = styled.div`
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
 function PlantList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
@@ -211,17 +217,19 @@ function PlantList() {
         />
       </SearchBar>
 
-      <FilterContainer>
-        {categories.map(category => (
-          <FilterButton
-            key={category}
-            $active={activeFilter === category}
-            onClick={() => setActiveFilter(category)}
-          >
-            {category.charAt(0).toUpperCase() + category.slice(1)}
-          </FilterButton>
-        ))}
-      </FilterContainer>
+      <MobileHidden>
+        <FilterContainer>
+          {categories.map(category => (
+            <FilterButton
+              key={category}
+              $active={activeFilter === category}
+              onClick={() => setActiveFilter(category)}
+            >
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </FilterButton>
+          ))}
+        </FilterContainer>
+      </MobileHidden>
 
       <PlantGrid>
         {currentPlants.map((plant, index) => (

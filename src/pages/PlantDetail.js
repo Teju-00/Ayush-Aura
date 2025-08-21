@@ -100,24 +100,31 @@ const ContentGrid = styled.div`
 const ModelSection = styled.div`
   background: white;
   border-radius: 1rem;
-  padding: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   @media (max-width: 768px) {
-    border-radius: 0.5rem;
-    padding: 0.8rem;
+    padding: 1rem;
   }
 `;
 
-const InfoSection = styled.div`
-  background: white;
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+const MobileNotice = styled.div`
+  background-color: #f0f9eb;
+  color: #67c23a;
+  padding: 0.8rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: center;
+
+  strong {
+    font-weight: 700;
+  }
 
   @media (max-width: 768px) {
-    border-radius: 0.5rem;
-    padding: 1.5rem;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
   }
 `;
 
@@ -131,6 +138,18 @@ const SectionTitle = styled.h2`
   @media (max-width: 768px) {
     font-size: 1.3rem;
     margin-bottom: 0.8rem;
+  }
+`;
+
+const InfoSection = styled.div`
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    border-radius: 0.5rem;
+    padding: 1.5rem;
   }
 `;
 
@@ -203,6 +222,9 @@ function PlantDetail() {
       <ContentGrid>
         <ModelSection>
           <SectionTitle>3D Model</SectionTitle>
+          <MobileNotice>
+            📱 <strong>Mobile Tip:</strong> Use touch gestures to rotate, pinch to zoom, and swipe to explore the 3D model
+          </MobileNotice>
           <OptimizedPlantModel modelPath={plant.model} scale={plant.scale || 1} position={plant.position || [0, 0, 0]} />
         </ModelSection>
 
