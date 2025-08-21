@@ -2,6 +2,7 @@ import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import PerformanceMonitor from './components/PerformanceMonitor';
+import OfflineIndicator from './components/OfflineIndicator';
 import PWAInstall from './components/PWAInstall';
 import { preloadModels } from './utils/modelPreloader';
 import plants from './data/plants';
@@ -76,6 +77,7 @@ function App() {
   return (
     <Router>
       <div className="App">
+        <OfflineIndicator />
         <Navbar />
         <Suspense fallback={<div style={{ padding: '2rem' }}>Loading...</div>}>
           <Routes>

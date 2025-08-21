@@ -1,23 +1,31 @@
-const CACHE_NAME = 'ayush-herbal-plants-v1';
-const STATIC_CACHE = 'static-v1';
-const IMAGE_CACHE = 'images-v1';
-const MODEL_CACHE = 'models-v1';
+const CACHE_NAME = 'ayush-herbal-plants-v2';
+const STATIC_CACHE = 'static-v2';
+const IMAGE_CACHE = 'images-v2';
+const MODEL_CACHE = 'models-v2';
+const OFFLINE_CACHE = 'offline-v2';
 
 const urlsToCache = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/offline.html'
 ];
 
-const ALLOWED_CACHES = [CACHE_NAME, STATIC_CACHE, IMAGE_CACHE, MODEL_CACHE];
+const ALLOWED_CACHES = [CACHE_NAME, STATIC_CACHE, IMAGE_CACHE, MODEL_CACHE, OFFLINE_CACHE];
 
-// Install event - cache static assets
+// Install event - cache static assets and offline page
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
+    Promise.all([
+      caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)),
+      caches.open(OFFLINE_CACHE).then(cache => 
+        cache.addAll([
+          '/offline.html',
+          '/static/css/main.css',
+          '/static/js/bundle.js'
+        ])
+      )
+    ])
   );
   self.skipWaiting();
 });
@@ -25,6 +33,12 @@ self.addEventListener('install', event => {
 // Fetch event - serve from cache if available
 self.addEventListener('fetch', event => {
   const request = event.request;
+  const url = new URL(request.url);
+
+  // Skip non-GET requests
+  if (request.method !== 'GET') {
+    return;
+  }
 
   // HTML navigation requests: network-first with cache fallback
   if (request.mode === 'navigate') {
@@ -32,10 +46,13 @@ self.addEventListener('fetch', event => {
       fetch(request)
         .then(response => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put('/', copy));
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
           return response;
         })
-        .catch(() => caches.match('/') || caches.match('/index.html'))
+        .catch(() => {
+          // Return offline page if navigation fails
+          return caches.match('/offline.html') || caches.match('/');
+        })
     );
     return;
   }
@@ -46,16 +63,21 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Images: stale-while-revalidate
+  // Images: cache-first with network fallback
   if (request.destination === 'image') {
-    event.respondWith(staleWhileRevalidate(request, IMAGE_CACHE));
+    event.respondWith(cacheFirst(request, IMAGE_CACHE));
     return;
   }
 
-  // GLB/GLTF models: stale-while-revalidate
-  const url = new URL(request.url);
+  // GLB/GLTF models: cache-first with network fallback
   if (url.pathname.endsWith('.glb') || url.pathname.endsWith('.gltf')) {
-    event.respondWith(staleWhileRevalidate(request, MODEL_CACHE));
+    event.respondWith(cacheFirst(request, MODEL_CACHE));
+    return;
+  }
+
+  // API calls: network-first with cache fallback
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(networkFirst(request, STATIC_CACHE));
     return;
   }
 
@@ -65,6 +87,33 @@ self.addEventListener('fetch', event => {
   );
 });
 
+// Cache-first strategy for static assets
+function cacheFirst(request, cacheName) {
+  return caches.open(cacheName).then(cache =>
+    cache.match(request).then(response => {
+      if (response) {
+        return response;
+      }
+      return fetch(request).then(networkResponse => {
+        cache.put(request, networkResponse.clone());
+        return networkResponse;
+      });
+    })
+  );
+}
+
+// Network-first strategy for dynamic content
+function networkFirst(request, cacheName) {
+  return fetch(request)
+    .then(response => {
+      const copy = response.clone();
+      caches.open(cacheName).then(cache => cache.put(request, copy));
+      return response;
+    })
+    .catch(() => caches.match(request));
+}
+
+// Stale-while-revalidate strategy for scripts/styles
 function staleWhileRevalidate(request, cacheName) {
   return caches.open(cacheName).then(cache =>
     cache.match(request).then(cachedResponse => {
@@ -101,3 +150,15 @@ self.addEventListener('message', event => {
     self.skipWaiting();
   }
 });
+
+// Background sync for offline actions
+self.addEventListener('sync', event => {
+  if (event.tag === 'background-sync') {
+    event.waitUntil(doBackgroundSync());
+  }
+});
+
+function doBackgroundSync() {
+  // Handle any background sync tasks
+  return Promise.resolve();
+}
