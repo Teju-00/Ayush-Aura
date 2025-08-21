@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -90,14 +90,14 @@ const CTAButton = styled(Link)`
   }
 `;
 
-const InstallAppButton = styled.button`
+const DownloadAppButton = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 1rem 2rem;
   background: linear-gradient(135deg, #2ecc71, #27ae60);
   color: white;
-  border: none;
+  text-decoration: none;
   border-radius: 0.5rem;
   font-weight: bold;
   font-size: 1rem;
@@ -121,11 +121,7 @@ const InstallAppButton = styled.button`
   }
 `;
 
-const InstallIcon = styled.span`
-  font-size: 1.2rem;
-`;
-
-const InstallText = styled.span`
+const DownloadText = styled.span`
   font-weight: 600;
 `;
 
@@ -202,33 +198,6 @@ const PlantDescription = styled.p`
 `;
 
 function Home() {
-  const [canInstall, setCanInstall] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
-
-  useEffect(() => {
-    // Listen for the beforeinstallprompt event
-    const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setCanInstall(true);
-    };
-
-    // Check if already installed
-    const checkIfInstalled = () => {
-      if (window.matchMedia('(display-mode: standalone)').matches || 
-          window.navigator.standalone === true) {
-        setCanInstall(false);
-      }
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    checkIfInstalled();
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
   const featuredPlants = [
     {
       id: 1,
@@ -250,26 +219,19 @@ function Home() {
     }
   ];
 
-  const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      // Show the install prompt
-      deferredPrompt.prompt();
-      
-      // Wait for the user to respond to the prompt
-      const { outcome } = await deferredPrompt.userChoice;
-      
-      if (outcome === 'accepted') {
-        console.log('User accepted the install prompt');
-        setCanInstall(false);
-      } else {
-        console.log('User dismissed the install prompt');
-      }
-      
-      // Clear the deferredPrompt
-      setDeferredPrompt(null);
+  const handleDownloadClick = () => {
+    // Detect platform and redirect to appropriate app store
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    
+    if (/android/i.test(userAgent)) {
+      // Redirect to Google Play Store (replace with actual app link)
+      window.open('https://play.google.com/store/apps/details?id=com.ayush.herbalplants', '_blank');
+    } else if (/iPad|iPhone|iPod/.test(userAgent)) {
+      // Redirect to Apple App Store (replace with actual app link)
+      window.open('https://apps.apple.com/app/ayush-herbal-plants/id123456789', '_blank');
     } else {
-      // Fallback: show instructions
-      alert('To install this app:\n\nAndroid: Tap menu → "Add to Home Screen"\niPhone: Tap Share → "Add to Home Screen"\nDesktop: Look for install prompt in address bar');
+      // Desktop - show both options
+      alert('Download AYUSH Herbal Plants App:\n\nAndroid: Google Play Store\niOS: Apple App Store');
     }
   };
 
@@ -283,10 +245,9 @@ function Home() {
         </Subtitle>
         <ButtonGroup>
           <CTAButton to="/plants">Explore Plants</CTAButton>
-          <InstallAppButton onClick={handleInstallClick}>
-            <InstallIcon>📱</InstallIcon>
-            <InstallText>Install App</InstallText>
-          </InstallAppButton>
+          <DownloadAppButton onClick={handleDownloadClick}>
+            <DownloadText>Download Mobile App</DownloadText>
+          </DownloadAppButton>
         </ButtonGroup>
       </HeroSection>
 
