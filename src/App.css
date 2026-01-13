@@ -1,0 +1,102 @@
+/* ============================================
+   AYUSH AURA 2.0 - App Styles
+   ============================================ */
+
+.App {
+  text-align: center;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  background-attachment: fixed;
+  position: relative;
+  transition: background 0.3s ease;
+}
+
+/* Subtle animated background overlay */
+.App::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, var(--accent-light) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--accent-light) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: backgroundShift 20s ease-in-out infinite;
+  transition: background 0.3s ease;
+}
+
+@keyframes backgroundShift {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+.App > * {
+  position: relative;
+  z-index: 1;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+  transition: color 0.3s ease;
+}
+
+.App-link:hover {
+  color: #4dd0e1;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive background adjustments */
+@media (max-width: 1024px) {
+  .App {
+    background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 50%, #c8e6c9 100%);
+  }
+}
+
+@media (max-width: 640px) {
+  .App {
+    background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
+  }
+  
+  .App::before {
+    display: none; /* Disable animation on mobile for performance */
+  }
+}

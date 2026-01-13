@@ -1,0 +1,71 @@
+{
+  "short_name": "AYUSH Plants",
+  "name": "AYUSH Herbal Plants - Medicinal Plants Guide",
+  "description": "Discover the Power of AYUSH Herbal Plants - Explore our comprehensive collection of 100 medicinal plants with detailed 3D models and traditional healing properties.",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#27ae60",
+  "background_color": "#ffffff",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["education", "health", "medical"],
+  "shortcuts": [
+    {
+      "name": "Browse Plants",
+      "short_name": "Plants",
+      "description": "View all medicinal plants",
+      "url": "/plants",
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "About AYUSH",
+      "short_name": "About",
+      "description": "Learn about AYUSH systems",
+      "url": "/about",
+      "icons": [
+        {
+          "src": "logo192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
+} 

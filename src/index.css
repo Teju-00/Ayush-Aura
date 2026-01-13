@@ -1,0 +1,221 @@
+/* ============================================
+   AYUSH AURA 2.0 - Global Styles
+   ============================================ */
+
+/* Theme Variables */
+:root {
+  /* Light Theme (Default) */
+  --bg-primary: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 25%, #c8e6c9 50%, #a5d6a7 75%, #81c784 100%);
+  --bg-secondary: rgba(255, 255, 255, 0.9);
+  --bg-tertiary: rgba(255, 255, 255, 0.75);
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --bg-glass-dark: rgba(0, 0, 0, 0.5);
+  --text-primary: #2c3e50;
+  --text-secondary: #5a6c5d;
+  --text-tertiary: #7f8c8d;
+  --text-inverse: #ffffff;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 8px 24px rgba(39, 174, 96, 0.3);
+  --accent-primary: #27ae60;
+  --accent-secondary: #2ecc71;
+  --accent-hover: #219a52;
+  --accent-light: rgba(39, 174, 96, 0.1);
+  --accent-gradient: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+[data-theme="dark"] {
+  /* Dark Theme */
+  --bg-primary: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 25%, #1e1e1e 50%, #2a2a2a 75%, #1f1f1f 100%);
+  --bg-secondary: rgba(30, 30, 30, 0.95);
+  --bg-tertiary: rgba(40, 40, 40, 0.9);
+  --bg-glass: rgba(30, 30, 30, 0.8);
+  --bg-glass-dark: rgba(0, 0, 0, 0.7);
+  --text-primary: #e8e8e8;
+  --text-secondary: #b8b8b8;
+  --text-tertiary: #888888;
+  --text-inverse: #1a1a1a;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 8px 24px rgba(39, 174, 96, 0.4);
+  --accent-primary: #2ecc71;
+  --accent-secondary: #27ae60;
+  --accent-hover: #34d97a;
+  --accent-light: rgba(46, 204, 113, 0.15);
+  --accent-gradient: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Global mobile responsive improvements */
+* {
+  box-sizing: border-box;
+}
+
+/* Page fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply fade-in to main content */
+.App > *:not(nav) {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Reusable hover utility classes */
+.hover-scale {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 8px 24px rgba(39, 174, 96, 0.3);
+  transform: translateY(-4px);
+}
+
+.hover-shadow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Improve touch targets on mobile */
+button, a, input, select, textarea {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Better focus states with modern styling */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #27ae60;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Responsive typography */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1280px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Improve scrolling on mobile */
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better focus states for mobile */
+  button:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 2px solid #27ae60;
+    outline-offset: 2px;
+  }
+}
+
+/* Ensure images don't overflow containers */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Improve button and link touch areas */
+@media (max-width: 768px) {
+  button, a {
+    padding: 0.8rem 1rem;
+  }
+}
+
+/* Smooth transitions for interactive elements */
+a, button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom scrollbar styling (webkit browsers) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27ae60;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #219a52;
+}

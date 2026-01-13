@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Discover the Power of AYUSH Herbal Plants - Explore our comprehensive collection of 100 medicinal plants with detailed 3D models and traditional healing properties."
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>AYUSH Herbal Plants - Discover Medicinal Plants</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://ybouzuswyfixyzyewepw.supabase.co">
+    <link rel="dns-prefetch" href="https://ybouzuswyfixyzyewepw.supabase.co">
+    
+    <!-- Performance optimizations -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- SEO optimizations -->
+    <meta name="keywords" content="AYUSH, herbal plants, medicinal plants, Ayurveda, 3D models, traditional medicine, Indian herbs">
+    <meta name="author" content="AYUSH Herbal Plants">
+    <meta property="og:title" content="AYUSH Herbal Plants - Discover Medicinal Plants">
+    <meta property="og:description" content="Explore our comprehensive collection of 100 medicinal plants with detailed 3D models and traditional healing properties.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ayush-herbal-plants.vercel.app">
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+      // Register service worker for PWA functionality + update prompt
+      if ('serviceWorker' in navigator) {
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshing) return;
+          refreshing = true;
+          window.location.reload();
+        });
+
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+              // If there's already a waiting worker (updated), notify app instead of auto-activating
+              if (registration.waiting && navigator.serviceWorker.controller) {
+                window.__SW_WAITING = registration.waiting;
+                window.dispatchEvent(new CustomEvent('sw-update-available'));
+              }
+
+              // Watch for updates
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                if (!newWorker) return;
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // An update has been installed and is waiting; notify the app UI
+                    window.__SW_WAITING = registration.waiting || newWorker;
+                    window.dispatchEvent(new CustomEvent('sw-update-available'));
+                  }
+                });
+              });
+            })
+            .catch(function(registrationError) {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+
+      // Silent performance monitoring (invisible but functional)
+      if (typeof window !== 'undefined') {
+        window.addEventListener('load', function() {
+          try {
+            if (window.performance && window.performance.timing) {
+              const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
+              // Store load time for internal use but don't display
+              window.pageLoadTime = loadTime;
+              // Optional: log to console only in development
+              if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'development') {
+                console.log('Page load time:', loadTime + 'ms');
+              }
+            }
+          } catch (error) {
+            // Silently handle any errors to prevent mobile issues
+            console.warn('Performance monitoring error:', error);
+          }
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html> 
