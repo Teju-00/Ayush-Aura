@@ -1,31 +1,32 @@
 import React, { Suspense, useState, useEffect, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, useGLTF, Html, Environment, Center, Preload } from '@react-three/drei';
+import { OrbitControls, useGLTF, Html, Environment, Center } from '@react-three/drei';
 import styled from 'styled-components';
 
 const ModelContainer = styled.div`
   width: 100%;
   height: 400px;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 1rem;
   overflow: hidden;
   position: relative;
+  border: 1px solid var(--border-color);
 `;
 
 const LoadingText = styled.div`
-  color: #666;
-  font-size: 1.2rem;
-  background: rgba(255,255,255,0.9);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  background: var(--bg-secondary);
   padding: 1rem 2rem;
   border-radius: 0.5rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-sm);
 `;
 
 const LoadingSpinner = styled.div`
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #27ae60;
+  border: 4px solid var(--border-color);
+  border-top: 4px solid var(--accent-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -44,20 +45,29 @@ const LoadingContainer = styled.div`
   height: 100%;
 `;
 
-const MobileOptimizationNotice = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(39, 174, 96, 0.9);
-  color: white;
-  padding: 0.5rem 0.8rem;
-  border-radius: 0.5rem;
-  font-size: 0.8rem;
-  z-index: 10;
+const ErrorMessage = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
 `;
 
-// Model cache to prevent re-loading the same models
-const modelCache = new Map();
+const ErrorText = styled.div`
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 500;
+`;
+
+const ErrorSubtext = styled.div`
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+`;
 
 function Model({ modelPath, scale = 1, position = [0, 0, 0] }) {
   const { scene } = useGLTF(modelPath);
@@ -76,22 +86,24 @@ function Model({ modelPath, scale = 1, position = [0, 0, 0] }) {
   );
 }
 
-// Preload component for better performance
-function ModelPreloader({ modelPath }) {
-  useGLTF.preload(modelPath);
-  return null;
-}
-
-function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0] }) {
+function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0], fallbackImage }) {
   const [hasError, setHasError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Validate model path on mount and changes
   useEffect(() => {
-    // Preload the model
-    if (modelPath && !modelCache.has(modelPath)) {
-      modelCache.set(modelPath, true);
+    if (!modelPath || typeof modelPath !== 'string' || !modelPath.trim() || 
+        modelPath === 'undefined' || modelPath === 'null') {
+      console.warn('Invalid or missing model path:', modelPath);
+      setHasError(true);
+      setIsLoading(false);
+      return;
     }
+
+    // Reset error state when path changes
+    setHasError(false);
+    setIsLoading(true);
   }, [modelPath]);
 
   // Detect mobile devices for optimization
@@ -107,76 +119,79 @@ function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0] }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Preflight check to fail fast if the GLB URL is not reachable
+  // Timeout fallback - if model doesn't load in 8 seconds, show error
   useEffect(() => {
-    let aborted = false;
-    if (!modelPath) return;
+    if (!modelPath || hasError || !isLoading) return;
 
-    setIsLoading(true);
-    fetch(modelPath, { method: 'HEAD' })
-      .then((response) => {
-        if (aborted) return;
-        if (!response.ok) {
-          setHasError(true);
-        }
-        setIsLoading(false);
-      })
-      .catch(() => {
-        if (!aborted) setHasError(true);
-        setIsLoading(false);
-      });
+    const timeout = setTimeout(() => {
+      console.warn('3D Model loading timeout after 8 seconds:', modelPath);
+      setHasError(true);
+      setIsLoading(false);
+    }, 8000);
 
     return () => {
-      aborted = true;
+      clearTimeout(timeout);
     };
-  }, [modelPath]);
+  }, [modelPath, hasError, isLoading]);
 
-  const handleModelError = () => {
-    setHasError(true);
-  };
-
-  // Only show error if model actually failed to load
+  // Show error state with fallback image if available
   if (hasError) {
+    if (fallbackImage) {
+      return (
+        <ModelContainer>
+          <img 
+            src={fallbackImage} 
+            alt="Plant image"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '1rem' }}
+          />
+        </ModelContainer>
+      );
+    }
+    
     return (
       <ModelContainer>
-        <LoadingContainer>
-          <LoadingText>Failed to load 3D model</LoadingText>
-        </LoadingContainer>
+        <ErrorMessage>
+          <ErrorText>3D model unavailable</ErrorText>
+          <ErrorSubtext>Unable to load the 3D model at this time.</ErrorSubtext>
+        </ErrorMessage>
+      </ModelContainer>
+    );
+  }
+
+  if (!modelPath || typeof modelPath !== 'string' || !modelPath.trim()) {
+    return (
+      <ModelContainer>
+        <ErrorMessage>
+          <ErrorText>3D model unavailable</ErrorText>
+        </ErrorMessage>
       </ModelContainer>
     );
   }
 
   return (
     <ModelContainer>
-      {isMobile && (
-        <MobileOptimizationNotice>
-          📱 Mobile Optimized
-        </MobileOptimizationNotice>
-      )}
-      
       <Canvas 
         camera={{ 
           position: [0, 0, 5], 
-          fov: isMobile ? 50 : 45, // Slightly wider FOV for mobile
+          fov: isMobile ? 50 : 45,
           near: 0.1, 
           far: 1000 
         }} 
-        shadows={!isMobile} // Disable shadows on mobile for better performance
+        shadows={!isMobile}
         gl={{ 
-          antialias: !isMobile, // Disable antialiasing on mobile
+          antialias: !isMobile,
           alpha: true,
           powerPreference: isMobile ? "default" : "high-performance",
-          stencil: false, // Disable stencil buffer on mobile
+          stencil: false,
           depth: true
         }}
-        dpr={isMobile ? 1 : [1, Math.min((window.devicePixelRatio || 1), 2)]} // Lower DPR on mobile
+        dpr={isMobile ? 1 : [1, Math.min((window.devicePixelRatio || 1), 2)]}
         onCreated={({ gl }) => {
           gl.setClearColor(0xf8f9fa, 1);
           if (!isMobile) {
             gl.shadowMap.enabled = true;
             gl.shadowMap.type = 2; // PCFSoftShadowMap
           }
-          // Optimize for mobile
           if (isMobile) {
             gl.setPixelRatio(1);
             gl.powerPreference = "default";
@@ -215,28 +230,23 @@ function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0] }) {
               modelPath={modelPath} 
               scale={scale} 
               position={position}
-              onError={handleModelError}
             />
           </Center>
           <OrbitControls 
-            enablePan={!isMobile} // Disable pan on mobile for better touch experience
+            enablePan={!isMobile}
             enableZoom 
             enableRotate 
             maxDistance={isMobile ? 8 : 10}
             minDistance={isMobile ? 1.5 : 2}
             dampingFactor={isMobile ? 0.1 : 0.05}
-            rotateSpeed={isMobile ? 0.5 : 1} // Slower rotation on mobile
-            zoomSpeed={isMobile ? 0.8 : 1} // Slower zoom on mobile
+            rotateSpeed={isMobile ? 0.5 : 1}
+            zoomSpeed={isMobile ? 0.8 : 1}
           />
           <Environment preset="apartment" background={false} />
-          <Preload all />
         </Suspense>
       </Canvas>
-      
-      {/* Preload the model for better performance */}
-      <ModelPreloader modelPath={modelPath} />
     </ModelContainer>
   );
 }
 
-export default OptimizedPlantModel; 
+export default OptimizedPlantModel;

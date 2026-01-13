@@ -226,7 +226,7 @@ function About() {
         </Text>
         <SocialLinks>
           <SocialLink
-            href="https://linkedin.com/in/kothuru-tejashwar"
+            href="https://www.linkedin.com/in/kothuru-tarakeswar-b6b434330/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn Profile"

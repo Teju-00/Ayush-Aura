@@ -6,7 +6,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import OfflineIndicator from './components/OfflineIndicator';
-import PWAInstall from './components/PWAInstall';
 import { preloadModels } from './utils/modelPreloader';
 import plants from './data/plants';
 
@@ -95,9 +94,8 @@ function App() {
                 <Route path="/mobile-test" element={<MobileTest />} />
               </Routes>
             </Suspense>
-            <Footer />
-            <PerformanceMonitor />
-            <PWAInstall />
+          <Footer />
+          <PerformanceMonitor />
           </div>
         </Router>
       </FavoritesProvider>

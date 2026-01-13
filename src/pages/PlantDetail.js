@@ -129,28 +129,6 @@ const ModelSection = styled(motion.div)`
   }
 `;
 
-const MobileNotice = styled.div`
-  background: var(--accent-light);
-  color: var(--accent-primary);
-  padding: 0.8rem 1rem;
-  border-radius: 0.75rem;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  text-align: center;
-  border: 1px solid var(--accent-primary);
-  opacity: 0.8;
-
-  strong {
-    font-weight: 700;
-  }
-
-  @media (max-width: 768px) {
-    padding: 0.6rem 0.8rem;
-    font-size: 0.8rem;
-  }
-`;
-
 const StructuredSection = styled(motion.section)`
   margin-top: 2rem;
   padding: 1.5rem;
@@ -382,10 +360,12 @@ function PlantDetail() {
           transition={{ delay: 0.3 }}
         >
           <SectionTitle>3D Model</SectionTitle>
-          <MobileNotice>
-            📱 <strong>Mobile Tip:</strong> Use touch gestures to rotate, pinch to zoom, and swipe to explore the 3D model
-          </MobileNotice>
-          <OptimizedPlantModel modelPath={plant.model} scale={plant.scale || 1} position={plant.position || [0, 0, 0]} />
+          <OptimizedPlantModel 
+            modelPath={plant.model} 
+            scale={plant.scale || 1} 
+            position={plant.position || [0, 0, 0]}
+            fallbackImage={plant.image}
+          />
         </ModelSection>
 
         <InfoSection

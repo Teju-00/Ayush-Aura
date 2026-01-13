@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { useTheme } from '../contexts/ThemeContext';
 
 const Nav = styled.nav`
   background: ${props => props.$scrolled 
-    ? 'var(--bg-glass)' 
-    : 'var(--bg-secondary)'};
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 1rem 2rem;
+    ? 'rgba(255, 255, 255, 0.8)' 
+    : 'rgba(255, 255, 255, 0.95)'};
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 1.25rem 2rem;
   box-shadow: ${props => props.$scrolled 
-    ? 'var(--shadow-md)' 
-    : 'var(--shadow-sm)'};
+    ? '0 4px 24px rgba(0, 0, 0, 0.08)' 
+    : '0 1px 3px rgba(0, 0, 0, 0.04)'};
   position: sticky;
   top: 0;
   z-index: 1000;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid ${props => props.$scrolled 
+    ? 'rgba(0, 0, 0, 0.08)' 
+    : 'rgba(0, 0, 0, 0.05)'};
 
   @media (max-width: 768px) {
-    padding: 1rem;
+    padding: 1rem 1.5rem;
   }
 `;
 
@@ -34,7 +35,8 @@ const NavContainer = styled.div`
 
 const Logo = styled(Link)`
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 800;
+  font-family: 'Poppins', sans-serif;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -42,14 +44,15 @@ const Logo = styled(Link)`
   text-decoration: none;
   transition: all 0.3s ease;
   position: relative;
+  letter-spacing: -0.02em;
   
   &:hover {
-    transform: scale(1.05);
+    transform: scale(1.02);
     filter: brightness(1.1);
   }
 
   @media (max-width: 768px) {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
   }
 `;
 
@@ -86,18 +89,19 @@ const NavLink = styled(Link)`
   color: var(--text-primary);
   text-decoration: none;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.95rem;
   position: relative;
-  padding: 0.5rem 0;
-  transition: color 0.3s ease;
+  padding: 0.5rem 0.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: -0.01em;
   
   &::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: 0;
+    left: 0.25rem;
     width: 0;
-    height: 2px;
+    height: 2.5px;
     background: var(--accent-gradient);
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 2px;
@@ -108,23 +112,24 @@ const NavLink = styled(Link)`
   }
   
   &:hover::after {
-    width: 100%;
+    width: calc(100% - 0.5rem);
   }
   
   &.active {
     color: var(--accent-primary);
+    font-weight: 600;
   }
   
   &.active::after {
-    width: 100%;
+    width: calc(100% - 0.5rem);
   }
 
   @media (max-width: 768px) {
-    padding: 1rem 0;
+    padding: 1rem 0.75rem;
     width: 100%;
     text-align: center;
     border-bottom: 1px solid var(--border-color);
-    font-size: 1.1rem;
+    font-size: 1rem;
     
     &::after {
       display: none;
@@ -166,47 +171,11 @@ const MobileMenuButton = styled.button`
   }
 `;
 
-const ThemeToggle = styled.button`
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--text-primary);
-  font-size: 1.2rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-left: 1rem;
-  position: relative;
-  overflow: hidden;
-
-  &:hover {
-    background: var(--accent-light);
-    border-color: var(--accent-primary);
-    transform: scale(1.1) rotate(15deg);
-    box-shadow: var(--shadow-glow);
-  }
-
-  &:active {
-    transform: scale(0.95) rotate(15deg);
-  }
-
-  @media (max-width: 768px) {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
-    margin-left: 0.5rem;
-  }
-`;
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -256,23 +225,14 @@ function Navbar() {
     <Nav $scrolled={scrolled}>
       <NavContainer>
         <Logo to="/" onClick={closeMenu}>AYUSH Aura</Logo>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <ThemeToggle
-            onClick={toggleTheme}
-            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-            title={theme === 'light' ? 'Dark mode' : 'Light mode'}
-          >
-            {theme === 'light' ? '🌙' : '☀️'}
-          </ThemeToggle>
-          <MobileMenuButton 
-            onClick={toggleMenu}
-            aria-expanded={isMenuOpen}
-            aria-controls="primary-navigation"
-            aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          >
-            {isMenuOpen ? '✕' : '☰'}
-          </MobileMenuButton>
-        </div>
+        <MobileMenuButton 
+          onClick={toggleMenu}
+          aria-expanded={isMenuOpen}
+          aria-controls="primary-navigation"
+          aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        >
+          {isMenuOpen ? '✕' : '☰'}
+        </MobileMenuButton>
         <NavLinks id="primary-navigation" isOpen={isMenuOpen}>
           <NavLinkWrapper>
             <NavLink 
