@@ -90,6 +90,11 @@ function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0], fallb
   const [hasError, setHasError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  // 👇 Detect placeholder (missing) 3D models
+  const isPlaceholderModel =
+  !modelPath ||
+  (typeof modelPath === 'string' && modelPath.includes('example.com'));
+
 
   // Validate model path on mount and changes
   useEffect(() => {
@@ -133,6 +138,23 @@ function OptimizedPlantModel({ modelPath, scale = 1, position = [0, 0, 0], fallb
       clearTimeout(timeout);
     };
   }, [modelPath, hasError, isLoading]);
+
+// 🚫 If model is a placeholder → DO NOT load Canvas
+if (isPlaceholderModel) {
+  return (
+    <ModelContainer
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'var(--text-secondary)',
+        fontSize: '0.95rem'
+      }}
+    >
+      3D model not available
+    </ModelContainer>
+  );
+}
 
   // Show error state with fallback image if available
   if (hasError) {
