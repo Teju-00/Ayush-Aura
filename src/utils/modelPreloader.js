@@ -5,14 +5,20 @@ const preloadedModels = new Set();
 
 // Preload a model
 export const preloadModel = (modelPath) => {
+  // 🚫 Skip fake / placeholder models
+  if (
+    !modelPath ||
+    typeof modelPath !== 'string' ||
+    modelPath.includes('example.com')
+  ) {
+    console.warn('Skipping preload for placeholder model:', modelPath);
+    return;
+  }
+
   if (!preloadedModels.has(modelPath)) {
-    try {
-      useGLTF.preload(modelPath);
-      preloadedModels.add(modelPath);
-      console.log(`Preloaded model: ${modelPath}`);
-    } catch (error) {
-      console.warn(`Failed to preload model: ${modelPath}`, error);
-    }
+    useGLTF.preload(modelPath);
+    preloadedModels.add(modelPath);
+    console.log(`Preloaded model: ${modelPath}`);
   }
 };
 
